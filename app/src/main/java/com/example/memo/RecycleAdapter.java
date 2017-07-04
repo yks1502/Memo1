@@ -32,8 +32,8 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.ViewHold
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
         Memo item = memoList.get(position);
-        viewHolder.titleView.setText("Title : " + item.title);
-        viewHolder.contentView.setText("Content : " + item.content);
+        viewHolder.titleView.setText("Title  " + item.title);
+        viewHolder.contentView.setText("Content  " + item.content);
         viewHolder.idView.setText(String.valueOf(item.id));
     }
 

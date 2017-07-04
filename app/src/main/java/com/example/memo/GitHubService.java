@@ -5,7 +5,12 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.DELETE;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
+import retrofit2.http.Path;
 
 
 /**
@@ -13,13 +18,21 @@ import retrofit2.http.GET;
  */
 
 public interface GitHubService {
+    @GET("memo")
+    Call<List<Memo>> getMemoList();
 
-    @GET("/memo/")
-    Call<List<Memo>> repoMemo();
+    @POST("memo")
+    @FormUrlEncoded
+    Call<Memo> insertMemo(@Field("title") String title,
+                          @Field("text") String content);
 
-    public static final Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("http://ec2-13-124-51-140.ap-northeast-2.compute.amazonaws.com:8000/memo/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build();
+    @POST("memo")
+    @FormUrlEncoded
+    Call<Memo> updateMemo(@Field("title") String title,
+                          @Field("text") String content,
+                          @Field("id") int id);
 
+    @DELETE("memo/{id}")
+    @FormUrlEncoded
+    Call<Memo> deleteMemo(@Field("id") int id);
 }

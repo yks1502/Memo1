@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -34,10 +35,9 @@ public class MainActivity extends AppCompatActivity {
     public static List<Memo> memoList;
     private LinearLayoutManager llm;
     public static DBHelper db;
-    GitHubService gitHubService = GitHubService.retrofit.create(GitHubService.class);
-    Call<List<Memo>> call = gitHubService.repoMemo();
-    List<Memo> result;
-    BackgroundTask task;
+    //GitHubService gitHubService = GitHubService.retrofit.create(GitHubService.class);
+    //Call<List<Memo>> call = gitHubService.repoMemo();
+    //List<Memo> result;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,15 +49,26 @@ public class MainActivity extends AppCompatActivity {
         rv.setHasFixedSize(true);
         llm = new LinearLayoutManager(this);
         rv.setLayoutManager(llm);
-        memoList = new ArrayList<>();
+        /*memoList = new ArrayList<>();
         db = new DBHelper(getApplicationContext(), "memo.db", null, 1);
         memoList = db.getList();
-        rv.setAdapter(new RecycleAdapter(memoList));
-        task = new BackgroundTask();
-        /*try {
-            result = call.execute().body();
-        } catch (IOException e){}
-        rv.setAdapter(new RecycleAdapter(result));*/
+        rv.setAdapter(new RecycleAdapter(memoList));*/
+        GitHubService apiService = ApiClient.getClient().create(GitHubService.class);
+
+        Call<List<Memo>> call = apiService.getMemoList();
+        call.enqueue(new Callback<List<Memo>>() {
+            @Override
+            public void onResponse(Call <List<Memo>> call, Response<List<Memo>> response) {
+                memoList = (ArrayList<Memo>) response.body();
+
+                rv.setAdapter(new RecycleAdapter(memoList));
+            }
+
+            @Override
+            public void onFailure(Call<List<Memo>> call, Throwable t) {
+
+            }
+        });
     }
 
     @Override
@@ -88,10 +99,11 @@ public class MainActivity extends AppCompatActivity {
                                     Toast.makeText(MainActivity.this, "You must enter a content first", Toast.LENGTH_SHORT).show();
                                     return;
                                 }
-                                db.insert(new Memo(taskTitle, taskContent));
+                                /*db.insert(new Memo(taskTitle, taskContent));
                                 memoList.clear();
                                 memoList = db.getList();
-                                rv.setAdapter(new RecycleAdapter(memoList));
+                                rv.setAdapter(new RecycleAdapter(memoList));*/
+                                //Call<>
                                 dialog.dismiss();
                             }
                         }
@@ -119,21 +131,4 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("rvID", rvID);
         startActivity(intent);
     }
-
-    /*List<Memo> result = call.execute().body();
-    call.enqueue(new Callback<List<Memo>>() {
-        @Override
-        public void onResponse(Call<List<Memo>> call, Response<List<Memo>> response) {
-            if (response.isSuccess()) {
-
-            }
-        }
-
-        @Override
-        public void onFailure
-    })*/
-     /*Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("http://ec2-13-124-51-140.ap-northeast-2.compute.amazonaws.com:8000/memo/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build();*/
 }
