@@ -35,9 +35,7 @@ public class MainActivity extends AppCompatActivity {
     public static List<Memo> memoList;
     private LinearLayoutManager llm;
     public static DBHelper db;
-    //GitHubService gitHubService = GitHubService.retrofit.create(GitHubService.class);
-    //Call<List<Memo>> call = gitHubService.repoMemo();
-    //List<Memo> result;
+    public static GitHubService apiService = ApiClient.getClient().create(GitHubService.class);;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,14 +51,12 @@ public class MainActivity extends AppCompatActivity {
         db = new DBHelper(getApplicationContext(), "memo.db", null, 1);
         memoList = db.getList();
         rv.setAdapter(new RecycleAdapter(memoList));*/
-        GitHubService apiService = ApiClient.getClient().create(GitHubService.class);
-
         Call<List<Memo>> call = apiService.getMemoList();
+
         call.enqueue(new Callback<List<Memo>>() {
             @Override
             public void onResponse(Call <List<Memo>> call, Response<List<Memo>> response) {
                 memoList = (ArrayList<Memo>) response.body();
-
                 rv.setAdapter(new RecycleAdapter(memoList));
             }
 
@@ -103,8 +99,35 @@ public class MainActivity extends AppCompatActivity {
                                 memoList.clear();
                                 memoList = db.getList();
                                 rv.setAdapter(new RecycleAdapter(memoList));*/
-                                //Call<>
+                                Call<Memo> call3 = apiService.postMemo(new Memo(taskTitle, taskContent));
+                                call3.enqueue(new Callback<Memo>() {
+                                    @Override
+                                    public void onResponse(Call<Memo> call, Response<Memo> response) {
+
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<Memo> call, Throwable t) {
+
+                                    }
+                                });
+
+                                Call<List<Memo>> call1 = apiService.getMemoList();
+
+                                call1.enqueue(new Callback<List<Memo>>() {
+                                    @Override
+                                    public void onResponse(Call <List<Memo>> call, Response<List<Memo>> response) {
+                                        memoList = (ArrayList<Memo>) response.body();
+                                        rv.setAdapter(new RecycleAdapter(memoList));
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<List<Memo>> call, Throwable t) {
+
+                                    }
+                                });
                                 dialog.dismiss();
+
                             }
                         }
                 );

@@ -9,6 +9,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class updateMemoActivity extends AppCompatActivity {
 
     @Override
@@ -36,10 +43,36 @@ public class updateMemoActivity extends AppCompatActivity {
                         }
                         int rvID = intent.getIntExtra("rvID", 1);
                         Memo memo = new Memo(updatedTitle, updatedContent, rvID);
-                        MainActivity.db.update(memo);
+                        /*MainActivity.db.update(memo);
                         MainActivity.memoList.clear();
                         MainActivity.memoList = MainActivity.db.getList();
-                        MainActivity.rv.setAdapter(new RecycleAdapter(MainActivity.memoList));
+                        MainActivity.rv.setAdapter(new RecycleAdapter(MainActivity.memoList));*/
+                        Call<Memo> call = MainActivity.apiService.updateMemo(memo, rvID);
+                        call.enqueue(new Callback<Memo>() {
+                            @Override
+                            public void onResponse(Call<Memo> call, Response<Memo> response) {
+
+                            }
+
+                            @Override
+                            public void onFailure(Call<Memo> call, Throwable t) {
+
+                            }
+                        });
+
+                        Call<List<Memo>> call4 = MainActivity.apiService.getMemoList();
+                        call4.enqueue(new Callback<List<Memo>>() {
+                            @Override
+                            public void onResponse(Call <List<Memo>> call, Response<List<Memo>> response) {
+                                MainActivity.memoList = (ArrayList<Memo>) response.body();
+                                MainActivity.rv.setAdapter(new RecycleAdapter(MainActivity.memoList));
+                            }
+
+                            @Override
+                            public void onFailure(Call<List<Memo>> call, Throwable t) {
+
+                            }
+                        });
                         finish();
                     }
                 }
@@ -59,10 +92,36 @@ public class updateMemoActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         int rvID = intent.getIntExtra("rvID", 1);
-                        MainActivity.db.delete(rvID);
+                        Call<Void> call = MainActivity.apiService.deleteMemo(rvID);
+                        call.enqueue(new Callback<Void>() {
+                            @Override
+                            public void onResponse(Call<Void> call, Response<Void> response) {
+
+                            }
+
+                            @Override
+                            public void onFailure(Call<Void> call, Throwable t) {
+
+                            }
+                        });
+
+                        Call<List<Memo>> call1 = MainActivity.apiService.getMemoList();
+                        call1.enqueue(new Callback<List<Memo>>() {
+                            @Override
+                            public void onResponse(Call <List<Memo>> call, Response<List<Memo>> response) {
+                                MainActivity.memoList = (ArrayList<Memo>) response.body();
+                                MainActivity.rv.setAdapter(new RecycleAdapter(MainActivity.memoList));
+                            }
+
+                            @Override
+                            public void onFailure(Call<List<Memo>> call, Throwable t) {
+
+                            }
+                        });
+                        /*MainActivity.db.delete(rvID);
                         MainActivity.memoList.clear();
                         MainActivity.memoList = MainActivity.db.getList();
-                        MainActivity.rv.setAdapter(new RecycleAdapter(MainActivity.memoList));
+                        MainActivity.rv.setAdapter(new RecycleAdapter(MainActivity.memoList));*/
                         finish();
                     }
                 }
